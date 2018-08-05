@@ -3,7 +3,10 @@ package com.annotest.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -153,9 +156,17 @@ public class ExcelUtil<T> {
      *            工作表的名称 
      * @param output 
      *            java输出流 
+     * @throws ClassNotFoundException 
+     * @throws SecurityException 
+     * @throws NoSuchMethodException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
+     * @throws InvocationTargetException 
+     * @throws IllegalArgumentException 
      */  
-    public boolean exportExcel(List<T> lists[], String sheetNames[],  
-            OutputStream output) {  
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public boolean exportExcel(List<T> lists[], String sheetNames[],  
+            OutputStream output) throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {  
         if (lists.length != sheetNames.length) {  
             System.out.println("数组长度不一致");  
             return false;  
@@ -192,10 +203,25 @@ public class ExcelUtil<T> {
                 // 如果设置了提示信息则鼠标放上去提示.  
                 if (!attr.prompt().trim().equals("")) {  
                     setHSSFPrompt(sheet, "", attr.prompt(), 1, 100, col, col);// 这里默认设了2-101列提示.  
-                }  
+                }
                 // 如果设置了combo属性则本列只能选择不能输入  
-                if (attr.combo().length > 0) {  
-                    setHSSFValidation(sheet, attr.combo(), 1, 100, col, col);// 这里默认设了2-101列只能选择不能输入.  
+                if (!attr.combo().isEmpty()) {
+                	String fieldName = field.getName();
+                	String className = toUpperCaseFirstOne(fieldName) + "Handler";
+                	String methodName =  fieldName+"Combo";
+                	Class<?> clazz = Class.forName("com.annotest.handler"+className);
+                    Object handler = (Object) clazz.newInstance();
+                    Method[] mtds = clazz.getMethods();
+                    String[] comboList = null;
+                    for(Method cc : mtds){
+                    	if(methodName.equals(cc.getName()))
+                    	{
+                    		comboList = (String[])cc.invoke(handler, comboList);
+                    		setHSSFValidation(sheet, comboList, 1, 100, col, col);// 这里默认设了2-101列只能选择不能输入.  
+                    		break;
+                    	}
+                    }
+                    
                 }  
                 cell.setCellStyle(style);  
             }  
@@ -241,7 +267,13 @@ public class ExcelUtil<T> {
 
     }  
 
-    /** 
+    public static String toUpperCaseFirstOne(String s){
+    	  if(Character.isUpperCase(s.charAt(0)))
+    	    return s;
+    	  else
+    	    return (new StringBuilder()).append(Character.toUpperCase(s.charAt(0))).append(s.substring(1)).toString();
+    	}
+	/** 
      * 对list数据源将其里面的数据导入到excel表单 
      *  
      * @param sheetName 
@@ -250,10 +282,17 @@ public class ExcelUtil<T> {
      *            每个sheet中数据的行数,此数值必须小于65536 
      * @param output 
      *            java输出流 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 * @throws ClassNotFoundException 
      */  
     @SuppressWarnings("unchecked")
     public boolean exportExcel(List<T> list, String sheetName,  
-            OutputStream output) {
+            OutputStream output) throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         //此处 对类型进行转换
         List<T> ilist = new ArrayList<T>();
         for (T t : list) {

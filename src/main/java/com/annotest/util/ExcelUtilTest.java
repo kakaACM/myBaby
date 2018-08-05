@@ -3,6 +3,7 @@ package com.annotest.util;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class ExcelUtilTest {
     private Logger logger = Logger.getLogger(ExcelUtilTest.class);
 
     @Test
-    public void exportExcel(){
+    public void exportExcel() throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
         // 初始化数据  
         List<Users> list = new ArrayList<Users>();  
 

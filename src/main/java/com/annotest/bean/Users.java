@@ -12,7 +12,7 @@ public class Users {
 	@Excel(name = "年龄", column = "C", prompt = "年龄保密哦!", isExport = false)
 	private int age;
 
-	@Excel(name = "班级", column = "D", combo = { "五期提高班", "六期提高班", "七期提高班" }, isExport = true)
+	@Excel(name = "班级", column = "D", combo = "clazzCombo", isExport = true)
 	private String clazz;
 
 	@Excel(name = "公司", column = "E", isExport = true)

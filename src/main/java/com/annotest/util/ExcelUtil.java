@@ -164,7 +164,6 @@ public class ExcelUtil<T> {
      * @throws InvocationTargetException 
      * @throws IllegalArgumentException 
      */  
-    @SuppressWarnings({ "unchecked", "rawtypes" })
 	public boolean exportExcel(List<T> lists[], String sheetNames[],  
             OutputStream output) throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {  
         if (lists.length != sheetNames.length) {  
@@ -205,7 +204,7 @@ public class ExcelUtil<T> {
                     setHSSFPrompt(sheet, "", attr.prompt(), 1, 100, col, col);// 这里默认设了2-101列提示.  
                 }
                 // 如果设置了combo属性则本列只能选择不能输入  
-                if (!attr.combo().isEmpty()) {
+                if (!attr.comboClass().isEmpty()) {
                 	String fieldName = field.getName();
                 	String className = toUpperCaseFirstOne(fieldName) + "Handler";
                 	String methodName =  fieldName+"Combo";
@@ -221,7 +220,9 @@ public class ExcelUtil<T> {
                     		break;
                     	}
                     }
-                    
+                }
+                if (attr.combo().length > 0) {  
+                    setHSSFValidation(sheet, attr.combo(), 1, 100, col, col);// 这里默认设了2-101列只能选择不能输入.  
                 }  
                 cell.setCellStyle(style);  
             }  

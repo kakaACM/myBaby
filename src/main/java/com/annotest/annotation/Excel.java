@@ -35,6 +35,11 @@ public @interface Excel {
 	/**
 	 * 设置只能选择不能输入的列内容.
 	 */
-	public abstract String combo() default "";
+	public abstract String comboClass() default "";
+	
+	/**
+	 * 设置只能选择不能输入的列内容.
+	 */
+	public abstract String[] combo() default {};
 
 }
